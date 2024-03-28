@@ -14,7 +14,7 @@ func main() {
 	r := gin.Default()
 	gin.DisableConsoleColor()
 
-	r.GET("/:ip", func(ctx *gin.Context) {
+	r.GET("/put/:ip", func(ctx *gin.Context) {
 		ip := ctx.Param("ip")
 		if regexp.MustCompile(reg).MatchString(ip) {
 			myip = ip
