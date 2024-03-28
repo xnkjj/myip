@@ -22,4 +22,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: xnkjj/myip:${{ github.sha }}
+          tags: xnkjj/myip:latest
