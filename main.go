@@ -18,8 +18,6 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DisableConsoleColor()
 	r := gin.Default()
-	r.ForwardedByClientIP = true
-	r.SetTrustedProxies([]string{gin.PlatformCloudflare})
 
 	r.GET("/put/:ip", func(ctx *gin.Context) {
 		if secret != ctx.GetHeader("SECRET") {
@@ -37,7 +35,7 @@ func main() {
 		if secret == ctx.GetHeader("SECRET") {
 			ctx.String(200, myip)
 		} else {
-			ctx.String(200, ctx.ClientIP())
+			ctx.String(200, ctx.GetHeader(gin.PlatformCloudflare))
 		}
 	})
 
