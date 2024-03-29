@@ -18,6 +18,7 @@ func main() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DisableConsoleColor()
 	r := gin.Default()
+	r.ForwardedByClientIP = true
 	r.SetTrustedProxies([]string{gin.PlatformCloudflare})
 
 	r.GET("/put/:ip", func(ctx *gin.Context) {
