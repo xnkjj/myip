@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto"
+	"encoding/base64"
+	"fmt"
 	"os"
 	"regexp"
 
@@ -10,6 +13,16 @@ import (
 var (
 	myip   string = ""
 	secret string = os.Getenv("SECRET")
+)
+
+var (
+	method = os.Getenv("SS_METHOD")
+	passwd = os.Getenv("SS_PASSWD")
+	port   = os.Getenv("SS_PORT")
+)
+
+const (
+	url = "ss://%s:%s@%s:%s"
 )
 
 const reg = `^(\d+).(\d+).(\d+).(\d+)$`
@@ -39,5 +52,26 @@ func main() {
 		}
 	})
 
+	r.GET("/listing", func(ctx *gin.Context) {
+		token := ctx.GetString("token")
+		if token != Md5(secret) {
+			ctx.String(200, ctx.GetHeader(gin.PlatformCloudflare))
+			return
+		}
+		u := fmt.Sprintf(url, method, passwd, myip, port)
+		u += "?remarks=testing"
+		ctx.String(200, u)
+	})
+
 	r.Run(":80")
+}
+
+func Md5(s string) string {
+	ha := crypto.MD5.New()
+	ha.Write([]byte(s))
+	return fmt.Sprintf("%x", ha.Sum(nil))
+}
+
+func Base64(s string) string {
+	return base64.StdEncoding.EncodeToString([]byte(s))
 }
