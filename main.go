@@ -22,7 +22,7 @@ var (
 )
 
 const (
-	url = "ss://%s:%s@%s:%s"
+	url = "ss://%s@%s:%s?remarks=US_DC6_CN_PROXY"
 )
 
 const reg = `^(\d+).(\d+).(\d+).(\d+)$`
@@ -53,14 +53,13 @@ func main() {
 	})
 
 	r.GET("/listing", func(ctx *gin.Context) {
-		token := ctx.GetString("token")
+		token := ctx.Query("token")
 		if token != Md5(secret) {
 			ctx.String(200, ctx.GetHeader(gin.PlatformCloudflare))
 			return
 		}
-		u := fmt.Sprintf(url, method, passwd, myip, port)
-		u += "?remarks=testing"
-		ctx.String(200, Base64(u))
+		mp := Base64(fmt.Sprintf("%s:%s", method, passwd))
+		ctx.String(200, Base64(fmt.Sprintf(url, mp, myip, port)))
 	})
 
 	r.Run(":80")
