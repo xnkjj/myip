@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,16 +14,7 @@ import (
 var (
 	myip   string = ""
 	secret string = os.Getenv("SECRET")
-)
-
-var (
-	method = os.Getenv("SS_METHOD")
-	passwd = os.Getenv("SS_PASSWD")
-	port   = os.Getenv("SS_PORT")
-)
-
-const (
-	url = "ss://%s@%s:%s?remarks=US_DC6_CN_PROXY"
+	ss     string = os.Getenv("SS_CONFIG")
 )
 
 const reg = `^(\d+).(\d+).(\d+).(\d+)$`
@@ -54,12 +46,12 @@ func main() {
 
 	r.GET("/listing", func(ctx *gin.Context) {
 		token := ctx.Query("token")
-		if token != Md5(secret) {
+		if token != Md5(secret) || len(myip) == 0 {
 			ctx.String(200, ctx.GetHeader(gin.PlatformCloudflare))
 			return
 		}
-		mp := Base64(fmt.Sprintf("%s:%s", method, passwd))
-		ctx.String(200, Base64(fmt.Sprintf(url, mp, myip, port)))
+		res := strings.ReplaceAll(ss, "{ip}", myip)
+		ctx.String(200, Base64(res))
 	})
 
 	r.Run(":80")
