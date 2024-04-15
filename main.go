@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto"
+	"crypto/md5"
 	"encoding/base64"
 	"fmt"
 	"os"
@@ -60,14 +60,14 @@ func main() {
 		}
 		u := fmt.Sprintf(url, method, passwd, myip, port)
 		u += "?remarks=testing"
-		ctx.String(200, u)
+		ctx.String(200, Base64(u))
 	})
 
 	r.Run(":80")
 }
 
 func Md5(s string) string {
-	ha := crypto.MD5.New()
+	ha := md5.New()
 	ha.Write([]byte(s))
 	return fmt.Sprintf("%x", ha.Sum(nil))
 }
