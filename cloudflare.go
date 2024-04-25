@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"myip/logger"
 	"os"
 
 	"github.com/cloudflare/cloudflare-go"
+	"github.com/shenzhencenter/logger"
 	"go.uber.org/zap"
 )
 
@@ -42,7 +42,7 @@ func GetRecord(ctx context.Context) (cloudflare.DNSRecord, error) {
 		return cloudflare.DNSRecord{}, err
 	}
 	if len(rs) == 0 {
-		logger.Error("client.ListDNSRecords", zap.String("zone", zone), zap.String("domain", domain))
+		logger.Info("client.ListDNSRecords.NotExisted", zap.String("zone", zone), zap.String("domain", domain))
 		return cloudflare.DNSRecord{}, nil
 	}
 	return rs[0], nil

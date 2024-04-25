@@ -1,14 +1,18 @@
 package main
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/base64"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shenzhencenter/ginhelper"
+	"github.com/shenzhencenter/logger"
 )
 
 var (
@@ -19,11 +23,9 @@ var (
 
 const reg = `^(\d+).(\d+).(\d+).(\d+)$`
 
-func main() {
-	gin.SetMode(gin.ReleaseMode)
-	gin.DisableConsoleColor()
-	r := gin.Default()
+type Router struct{}
 
+func (*Router) Register(r *gin.Engine) {
 	r.GET("/put/:ip", func(ctx *gin.Context) {
 		if secret != ctx.GetHeader("SECRET") {
 			ctx.String(403, "Forbidden")
@@ -56,8 +58,6 @@ func main() {
 		res := strings.ReplaceAll(ss, "{ip}", myip)
 		ctx.String(200, Base64(res))
 	})
-
-	r.Run(":80")
 }
 
 func Md5(s string) string {
@@ -68,4 +68,14 @@ func Md5(s string) string {
 
 func Base64(s string) string {
 	return base64.StdEncoding.EncodeToString([]byte(s))
+}
+
+func main() {
+	ctx := context.Background()
+	log := logger.I()
+	ginhelper.NewApp(log,
+		ginhelper.WithRouter(&Router{}),
+		ginhelper.WithAddr(":80"),
+		ginhelper.WithCtxTimeout(time.Second*3),
+	).Run(ctx, ginhelper.LoggerMiddleware(log, "/ping", "/"), ginhelper.Recovery(log))
 }
