@@ -26,6 +26,9 @@ const reg = `^(\d+).(\d+).(\d+).(\d+)$`
 type Router struct{}
 
 func (*Router) Register(r *gin.Engine) {
+
+	r.GET("/metrics", ginhelper.GinMetricsHandler())
+
 	r.GET("/put/:ip", func(ctx *gin.Context) {
 		if secret != ctx.GetHeader("SECRET") {
 			ctx.String(403, "Forbidden")
@@ -77,5 +80,5 @@ func main() {
 		ginhelper.WithRouter(&Router{}),
 		ginhelper.WithAddr(":80"),
 		ginhelper.WithCtxTimeout(time.Second*3),
-	).Run(ctx, ginhelper.LoggerMiddleware(log, "/ping", "/"), ginhelper.Recovery(log))
+	).Run(ctx, ginhelper.LoggerMiddleware(log, "/ping"), ginhelper.Recovery(log), ginhelper.GinMetricsMiddleware("/metrics", "/ping"))
 }
