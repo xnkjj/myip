@@ -74,9 +74,11 @@ func PutRecord(ctx context.Context, ip string) error {
 
 	if r.ID == "" {
 		record, err = client.CreateDNSRecord(ctx, zoneResource, createParams)
-	} else {
+	} else if r.Content != ip {
 		updateParams.ID = r.ID
 		record, err = client.UpdateDNSRecord(ctx, zoneResource, updateParams)
+	} else {
+		record = r
 	}
 	if err != nil {
 		logger.Error("client.CreateDNSRecord", zap.Error(err), zap.Any("record", r), zap.Any("createParams", createParams), zap.Any("updateParams", updateParams))
