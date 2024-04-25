@@ -33,6 +33,9 @@ func main() {
 		if regexp.MustCompile(reg).MatchString(ip) {
 			myip = ip
 		}
+		go func(ip string) {
+			_ = PutRecord(ctx, ip)
+		}(myip)
 		ctx.String(200, myip)
 	})
 
